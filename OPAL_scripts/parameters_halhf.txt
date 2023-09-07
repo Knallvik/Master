@@ -1,0 +1,27 @@
+Witness:
+    Energy: 5 - 500 GeV
+    Bunch population: 1e10
+    Length: 9e-6 m
+    Length at IP: 75e-6 m
+    E_spread: 0.0015
+    Horizontal emittance (norm): 160e-6 m
+    Vertical emittance (norm): 0.56e-6 m
+
+Driver:
+    Energy: 31.25 GeV
+    Bunch population: 2.7e10
+    Length: 27.6e-6 m
+    Av. beam power: 21.4e6 W
+    Bunch separation: 5e-9 s
+    
+PWFA:
+    Number of stages: 16
+    Plasma density: 1.5e16 cm⁻³ = 1.5e22 m⁻³
+    In plasma accelerating gradient: 6.4 GV/m
+    Average gradient: 1.2 GV/m
+    Length per stage: 5 m
+    Energy gain per stage: 31.9e9 eV
+    Driver-to-wake efficiency: 0.74
+    Wake-to-witness efficiency: 0.53
+    Driver-to-witness: 0.39
+    Wall-plug-to-beam efficiency: 19.5
