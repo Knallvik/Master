@@ -16,7 +16,7 @@ Driver:
     
 PWFA:
     Number of stages: 16
-    Plasma density: 1.5e16 cm⁻³ = 1.5e22 m⁻³
+    Plasma density: 7e15 cm⁻³ = 7e21 m⁻³
     In plasma accelerating gradient: 6.4 GV/m
     Average gradient: 1.2 GV/m
     Length per stage: 5 m
@@ -25,3 +25,6 @@ PWFA:
     Wake-to-witness efficiency: 0.53
     Driver-to-witness: 0.39
     Wall-plug-to-beam efficiency: 19.5
+
+
+classes/runnable --> line 42. from joblib import parallell
