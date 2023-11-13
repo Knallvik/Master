@@ -22,7 +22,7 @@ class Beam():
             
         self.trackable_number = -1 # will increase to 0 after first tracking element
         self.stage_number = 0
-        self.location = 0        
+        self.location = 0
     
     
     # reset phase space
@@ -513,8 +513,11 @@ class Beam():
     def apply_betatron_radiation_reaction(self, L, n0, deltaEs, x0_driver=0, y0_driver=0, enable_rr = True):
 
         # remove particles with subzero energy
-        del self[self.Es() < 0]
-        del self[np.isnan(self.Es())]
+        i = np.where(self.Es() < 0) + np.where(np.isnan(self.Es())) + np.where(self.zs() < self.z_offset()-200e-6)
+        
+        del self[i]
+        deltaEs = np.delete(deltaEs, i)
+        
         gamma0s = energy2gamma(self.Es())
         
         gammas = energy2gamma(abs(self.Es()+deltaEs))

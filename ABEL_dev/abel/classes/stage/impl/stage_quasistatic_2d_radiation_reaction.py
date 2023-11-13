@@ -97,11 +97,11 @@ class StageQuasistatic2dRadiationReaction(Stage):
         # calculate energy gain
         delta_Es = self.length*(beam.Es() - beam0.Es())/dz
         
-        # find driver offset (to shift the beam relative) and apply betatron motion
+        # find driver offset (to shift the beam relative) and apply betatron motion        
         final_Es = beam.apply_betatron_radiation_reaction(self.length, self.plasma_density, delta_Es, x0_driver=driver0.x_offset(), y0_driver=driver0.y_offset(), enable_rr=self.enable_rr)
 
         #New delta_Es due to radiation reaction
-        delta_Es = final_Es - beam0.Es()
+        #delta_Es = final_Es - beam0.Es()
         
         # accelerate beam (and remove nans)
         beam.set_Es(final_Es)

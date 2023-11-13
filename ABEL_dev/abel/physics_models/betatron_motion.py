@@ -31,19 +31,20 @@ def evolve_betatron_motion(x0, ux0, y0, uy0, L, gamma, dgamma_ds, kp, enable_rr 
     # Constants
     #Ezs = Es/L #eV/m = J/e/m = V/m
     Ezs = dgamma_ds*SI.m_e*SI.c**2/SI.e #eV/m = J/e/m = V/m
-
+    
+    K = kp/ np.sqrt(2)
+    B = SI.c**2 * K**2 # constant
+    Cs = SI.e/SI.m_e/SI.c * Ezs # vector, dependant on Ez = E / L
     #Plasma constants
     if enable_rr:
         tau_r = 2*re/3/SI.c
+        A = tau_r * SI.c**2 * K**2 # constant
+        D = tau_r * SI.c**2 * K**4 # constant
     else:
         tau_r = 0
-        
-    K = kp/ np.sqrt(2)
+        A = 0
+        D = 0
 
-    A = tau_r * SI.c**2 * K**2 # constant
-    B = SI.c**2 * K**2 # constant
-    Cs = SI.e/SI.m_e/SI.c * Ezs # vector, dependant on Ez = E / L
-    D = tau_r * SI.c**2 * K**4 # constant
 
     #Find the smallest wavelength of oscillations to resolve
     beta_matched = np.sqrt(2*gamma)/kp # Vector
