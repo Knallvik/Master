@@ -10,12 +10,13 @@ from openpmd_viewer import OpenPMDTimeSeries
 
 class StageHipace(Stage):
     
-    def __init__(self, length=None, nom_energy_gain=None, plasma_density=None, driver_source=None, add_driver_to_beam=False, keep_data=False, full_output=False):
+    def __init__(self, length=None, nom_energy_gain=None, plasma_density=None, radiation_reaction = True, driver_source=None, add_driver_to_beam=False, keep_data=False, full_output=False):
         
         super().__init__(length, nom_energy_gain, plasma_density)
         
         self.driver_source = driver_source
         self.add_driver_to_beam = add_driver_to_beam
+        self.radiation_reaction = radiation_reaction
         
         self.keep_data = keep_data
         self.full_output = full_output
@@ -82,7 +83,7 @@ class StageHipace(Stage):
         
         # input file
         filename_input = tmpfolder + 'input_file'
-        hipace_write_inputs(filename_input, filename_beam, filename_driver, self.plasma_density, self.num_steps, time_step, box_range_z, box_size_xy, output_period=output_period)
+        hipace_write_inputs(filename_input, filename_beam, filename_driver, self.plasma_density, self.num_steps, time_step, box_range_z, box_size_xy, output_period=output_period, radiation_reaction = self.radiation_reaction)
         
         
         ## RUN SIMULATION

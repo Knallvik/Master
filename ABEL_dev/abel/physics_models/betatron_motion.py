@@ -113,48 +113,5 @@ def evolve_betatron_motion(x0, ux0, y0, uy0, L, gamma, dgamma_ds, kp, enable_rr 
     xs, uxs, ys, uys, Es = res[:,0], res[:,1], res[:,2], res[:,3], res[:,4]
 
     return xs, uxs, ys, uys, Es
-    """
-    
-    for i, (x_, vx_, y_, vy_, gamma_, C_, lambda_beta_) in enumerate(zip(x0, vxs, y0, vys, gamma, Cs, lambda_beta)):
-        # Define timesteps
-        n = round(L/lambda_beta_ * n_per_beta)
-        t = np.linspace(0,T,n)
-        # Find initial velocity
-        # u = p/SI.m_e, dividing by gamma gives velocity
-        # Initial values
-        sysinits = np.array([x_, vx_, y_, vy_, gamma_])
-        # Solve the radiation reaction eqaution of motion
-        solution = solve_ivp(fun = oscillator2d, y0 = sysinits, method='RK45', \
-                             t_span = (0,T), t_eval = t, args = (A, B, C_, D))
-    
-        x_end = solution.y[0, -1]
-        xs[i] = x_end
-        
-        vx_end = solution.y[1, -1]
-        
-        y_end = solution.y[2, -1]
-        ys[i] = y_end
-        
-        vy_end = solution.y[3, -1]
-        
-        gamma_end = solution.y[4, -1]
-        
-        ux_end = vx_end * gamma_end
-        uxs[i] = ux_end
-        
-        uy_end = vy_end * gamma_end
-        uys[i] = uy_end
-        
-        #if i ==0:
-        #    print(vx_end, vy_end)
-        #    print(x_dot0, y_end)
-        #    plt.plot(t, solution.y[0,:])
-        #    plt.show()
 
-        E = gamma_end*SI.m_e*SI.c**2 / SI.e # eV
-        Es[i] = E
-    
-    return xs, uxs, ys, uys, Es
-    
-"""
 

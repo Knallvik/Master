@@ -22,6 +22,7 @@ beams.names = driver beam
 beam.injection_type = from_file
 beam.input_file = $filename_beam
 beam.iteration = 0
+beam.do_radiation_reaction = $do_radiation_reaction
 
 driver.injection_type = from_file
 driver.input_file = $filename_driver
