@@ -8,7 +8,9 @@ import joblib.parallel
 import collections
 import numpy as np
 from matplotlib import pyplot as plt
-import dill as pickle
+import cloudpickle
+import pyspark.serializers
+pyspark.serializers.cloudpickle = cloudpickle
 
 class Runnable(ABC):
     
@@ -100,12 +102,12 @@ class Runnable(ABC):
     # save object to file
     def save(self):
         with open(self.object_path(), 'wb') as savefile:
-            pickle.dump(self, savefile, pickle.HIGHEST_PROTOCOL)
+            cloudpickle.dump(self, savefile)
             
     # load object from file
     def load(self, shot=None):
         with open(self.object_path(shot), 'rb') as loadfile:
-            obj = pickle.load(loadfile)
+            obj = cloudpickle.load(loadfile)
             return obj
     
     
@@ -229,8 +231,7 @@ class Runnable(ABC):
     
     # plot value of beam parameters across a scan
     def plot_beam_function(self, beam_fcn, index=-1, label=None, scale=1, xscale='linear', yscale='linear'):
-        fig, ax = self.plot_function(lambda obj : beam_fcn(obj.get_beam(index=index)), label=label, scale=scale, xscale=xscale, yscale=yscale)
-        return fig, ax
+        self.plot_function(lambda obj : beam_fcn(obj.get_beam(index=index)), label=label, scale=scale, xscale=xscale, yscale=yscale)
 
     def plot_energy(self, index=-1):
         self.plot_beam_function(Beam.energy, scale=1e9, label='Energy (GeV)', index=index)
@@ -276,7 +277,6 @@ class Runnable(ABC):
         ax.set_ylabel(label)
         ax.set_xscale(xscale)
         ax.set_yscale(yscale)
-        return fig, ax
 
     
     def plot_waterfall(self, proj_fcn, label=None, scale=1, index=-1):

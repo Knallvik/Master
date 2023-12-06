@@ -7,7 +7,6 @@ from abel.utilities.relativity import energy2proper_velocity, proper_velocity2en
 from abel.utilities.statistics import prct_clean, prct_clean2d
 from abel.utilities.plasma_physics import k_p
 from abel.physics_models.hills_equation import evolve_hills_equation_analytic
-from abel.physics_models.betatron_motion import evolve_betatron_motion
 from matplotlib import pyplot as plt
 
 class Beam():
@@ -22,7 +21,7 @@ class Beam():
             
         self.trackable_number = -1 # will increase to 0 after first tracking element
         self.stage_number = 0
-        self.location = 0
+        self.location = 0        
     
     
     # reset phase space
@@ -321,6 +320,16 @@ class Beam():
         Is, _ = self.current_profile()
         return max(abs(Is))
     
+
+    ## BEAM HALO CLEANING (EXTREME OUTLIERS)
+    def remove_halo_particles(self, nsigma=20):
+        xfilter = np.abs(self.xs()-self.x_offset(clean=True)) > nsigma*self.beam_size_x(clean=True)
+        xpfilter = np.abs(self.xps()-self.x_angle(clean=True)) > nsigma*self.divergence_x(clean=True)
+        yfilter = np.abs(self.ys()-self.y_offset(clean=True)) > nsigma*self.beam_size_y(clean=True)
+        ypfilter = np.abs(self.ys()-self.y_angle(clean=True)) > nsigma*self.divergence_y(clean=True)
+        filter = np.logical_or(np.logical_or(xfilter, xpfilter), np.logical_or(yfilter, ypfilter))
+        del self[filter]
+
     
     ## BEAM PROJECTIONS
     
@@ -509,30 +518,6 @@ class Beam():
         self.set_uxs(uxs)
         self.set_ys(ys+y0_driver)
         self.set_uys(uys)
-
-    def apply_betatron_radiation_reaction(self, L, n0, deltaEs, x0_driver=0, y0_driver=0, enable_rr = True):
-
-        # remove particles with subzero energy
-        i = np.where(self.Es() < 0) + np.where(np.isnan(self.Es())) + np.where(self.zs() < self.z_offset()-200e-6)
-        
-        del self[i]
-        deltaEs = np.delete(deltaEs, i)
-        
-        gamma0s = energy2gamma(self.Es())
-        
-        gammas = energy2gamma(abs(self.Es()+deltaEs))
-        dgamma_ds = (gammas-gamma0s)/L
-        
-        # calculate final positions and normalized momentum after betatron motion
-        xs, uxs, ys, uys, Es = evolve_betatron_motion(self.xs()-x0_driver, self.uxs(), self.ys()-y0_driver, self.uys(), L, gamma0s, dgamma_ds, k_p(n0), enable_rr)
-        
-        # set new beam positions and normalized momentum (shift back driver offsets)
-        self.set_xs(xs+x0_driver)
-        self.set_uxs(uxs)
-        self.set_ys(ys+y0_driver)
-        self.set_uys(uys)
-
-        return Es
         
         
   

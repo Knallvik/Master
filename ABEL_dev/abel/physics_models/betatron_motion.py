@@ -108,7 +108,7 @@ def evolve_betatron_motion(x0, ux0, y0, uy0, L, gamma, dgamma_ds, kp, enable_rr 
     
         return x_end, ux_end, y_end, uy_end, E
 
-    res = np.array(Parallel(n_jobs=num_cores)(delayed(parallel_process)(i) for i in range(length)))
+    res = np.array(Parallel(n_jobs=15)(delayed(parallel_process)(i) for i in range(length)))
 
     xs, uxs, ys, uys, Es = res[:,0], res[:,1], res[:,2], res[:,3], res[:,4]
 
