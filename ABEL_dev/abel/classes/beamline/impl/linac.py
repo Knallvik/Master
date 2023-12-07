@@ -309,9 +309,8 @@ class Linac(Beamline):
         axs[2,2].set_ylabel('Transverse offset (um)')
         
         plt.show()
-
     
-    
+        return fig
     
     # density plots
     def plot_waterfalls(self, shot=None):
@@ -345,7 +344,7 @@ class Linac(Beamline):
         # current profile
         Is = waterfalls[0]
         ts = bins[0]
-        c0 = axs[0].pcolor(trackable_numbers, ts*SI.c*1e6, -Is/1e3, cmap='GnBu', shading='auto')
+        c0 = axs[0].pcolor(trackable_numbers, ts*SI.c*1e6, -Is/1e3, cmap=CONFIG.default_cmap, shading='auto')
         cbar0 = fig.colorbar(c0, ax=axs[0])
         axs[0].set_ylabel('Longitudinal position (um)')
         cbar0.ax.set_ylabel('Beam current (kA)')
@@ -354,21 +353,21 @@ class Linac(Beamline):
         # energy profile
         dQddeltas = waterfalls[1]
         deltas = bins[1]
-        c1 = axs[1].pcolor(trackable_numbers, deltas*1e2, -dQddeltas*1e7, cmap='GnBu', shading='auto')
+        c1 = axs[1].pcolor(trackable_numbers, deltas*1e2, -dQddeltas*1e7, cmap=CONFIG.default_cmap, shading='auto')
         cbar1 = fig.colorbar(c1, ax=axs[1])
         axs[1].set_ylabel('Energy offset (%)')
         cbar1.ax.set_ylabel('Spectral density (nC/%)')
         
         densityX = waterfalls[2]
         xs = bins[2]
-        c2 = axs[2].pcolor(trackable_numbers, xs*1e6, -densityX*1e3, cmap='GnBu', shading='auto')
+        c2 = axs[2].pcolor(trackable_numbers, xs*1e6, -densityX*1e3, cmap=CONFIG.default_cmap, shading='auto')
         cbar2 = fig.colorbar(c2, ax=axs[2])
         axs[2].set_ylabel('Horizontal position (um)')
         cbar2.ax.set_ylabel('Charge density (nC/um)')
         
         densityY = waterfalls[3]
         ys = bins[3]
-        c3 = axs[3].pcolor(trackable_numbers, ys*1e6, -densityY*1e3, cmap='GnBu', shading='auto')
+        c3 = axs[3].pcolor(trackable_numbers, ys*1e6, -densityY*1e3, cmap=CONFIG.default_cmap, shading='auto')
         cbar3 = fig.colorbar(c3, ax=axs[3])
         axs[3].set_xlabel('Trackable element number')
         axs[3].set_ylabel('Vertical position (um)')
@@ -376,10 +375,9 @@ class Linac(Beamline):
         
         plt.show()
 
-        return fig
     
     # animate the longitudinal phase space
-    def animate_lps(self, rel_energy_window=0.06):
+    def animate_lps(self, file_name, rel_energy_window=0.06):
         
         # set up figure
         fig, axs = plt.subplots(3, 2, gridspec_kw={'width_ratios': [2, 1], 'height_ratios': [1, 2, 1]})
@@ -451,7 +449,7 @@ class Linac(Beamline):
             axs[1,0].cla()
             Ebins = Es_nom[i]*np.linspace(1-rel_energy_window, 1+rel_energy_window, 2*Es0.size)
             dQdzdE, zs, Es = beam.phase_space_density(beam.zs, beam.Es, hbins=zs0, vbins=Ebins)
-            cax = axs[1,0].pcolor(zs*1e6, Es/1e9, -dQdzdE*1e15, cmap='GnBu', shading='auto', clim=[0, abs(dQdzdE).max()*1e15])
+            cax = axs[1,0].pcolor(zs*1e6, Es/1e9, -dQdzdE*1e15, cmap=CONFIG.default_cmap, shading='auto', clim=[0, abs(dQdzdE).max()*1e15])
             axs[1,0].set_ylabel('Energy (GeV)')
             axs[1,0].set_title('Longitudinal phase space')
             
@@ -503,7 +501,10 @@ class Linac(Beamline):
         plot_path = self.run_path() + 'plots/'
         if not os.path.exists(plot_path):
             os.makedirs(plot_path)
-        filename = plot_path + 'lps_shot' + str(self.shot) + '.gif'
+        if file_name is None:
+            filename = plot_path + 'lps_shot' + str(self.shot) + '.gif'
+        else:
+            filename = file_name + '.gif'
         animation.save(filename, writer="pillow", fps=10)
 
         # hide the figure
@@ -590,7 +591,7 @@ class Linac(Beamline):
             # plot phase space
             dQdxdpx, xs, pxs = beam.phase_space_density(beam.xs, beam.pxs, hbins=xs0, vbins=pxs_final)
             axs[1,0].cla()
-            cax = axs[1,0].pcolor(xs*1e6, pxs*1e-6*SI.c/SI.e, -dQdxdpx, cmap='GnBu', shading='auto')
+            cax = axs[1,0].pcolor(xs*1e6, pxs*1e-6*SI.c/SI.e, -dQdxdpx, cmap=CONFIG.default_cmap, shading='auto')
             axs[1,0].set_ylabel("Momentum, $p_x$ (MeV/c)")
             axs[1,0].set_title('Horizontal phase space')
             
@@ -728,7 +729,7 @@ class Linac(Beamline):
             # plot phase space
             dQdydpy, ys, pys = beam.phase_space_density(beam.ys, beam.pys, hbins=ys0, vbins=pys_final)
             axs[1,0].cla()
-            cax = axs[1,0].pcolor(ys*1e6, pys*1e-6*SI.c/SI.e, -dQdydpy, cmap='GnBu', shading='auto')
+            cax = axs[1,0].pcolor(ys*1e6, pys*1e-6*SI.c/SI.e, -dQdydpy, cmap=CONFIG.default_cmap, shading='auto')
             axs[1,0].set_ylabel("Momentum, $p_y$ (MeV/c)")
             axs[1,0].set_title('Vertical phase space')
             
@@ -788,7 +789,7 @@ class Linac(Beamline):
 
     
     # animate the horizontal sideview (top view)
-    def animate_sideview_x(self, file_name):
+    def animate_sideview_x(self):
         
         # set up figure
         fig, axs = plt.subplots(3, 2, gridspec_kw={'width_ratios': [2, 1], 'height_ratios': [1, 2, 1]})
@@ -861,7 +862,7 @@ class Linac(Beamline):
             # plot phase space
             dQdzdx, zs, xs = beam.phase_space_density(beam.zs, beam.xs, hbins=zs0, vbins=xs0)
             axs[1,0].cla()
-            cax = axs[1,0].pcolor(zs*1e6, xs*1e6, -dQdzdx, cmap='GnBu', shading='auto')
+            cax = axs[1,0].pcolor(zs*1e6, xs*1e6, -dQdzdx, cmap=CONFIG.default_cmap, shading='auto')
             axs[1,0].set_ylabel("Transverse offset, $x$ (um)")
             axs[1,0].set_title('Horizontal sideview (top view)')
 
@@ -912,11 +913,7 @@ class Linac(Beamline):
         plot_path = self.run_path() + 'plots/'
         if not os.path.exists(plot_path):
             os.makedirs(plot_path)
-        if file_name is None:
-            filename = plot_path + 'lps_shot' + str(self.shot) + '.gif'
-        else:
-            filename = file_name + '.gif'
-            
+        filename = plot_path + 'sideview_x_shot' + str(self.shot) + '.gif'
         animation.save(filename, writer="pillow", fps=10)
 
         # hide the figure
@@ -1000,7 +997,7 @@ class Linac(Beamline):
             # plot phase space
             dQdzdy, zs, ys = beam.phase_space_density(beam.zs, beam.ys, hbins=zs0, vbins=ys0)
             axs[1,0].cla()
-            cax = axs[1,0].pcolor(zs*1e6, ys*1e6, -dQdzdy, cmap='GnBu', shading='auto')
+            cax = axs[1,0].pcolor(zs*1e6, ys*1e6, -dQdzdy, cmap=CONFIG.default_cmap, shading='auto')
             axs[1,0].set_ylabel("Transverse offset, $y$ (um)")
             axs[1,0].set_title('Vertical sideview')
 

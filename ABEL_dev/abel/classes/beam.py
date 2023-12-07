@@ -2,11 +2,13 @@ import numpy as np
 import openpmd_api as io
 from datetime import datetime
 from pytz import timezone
+from abel import CONFIG
 import scipy.constants as SI
 from abel.utilities.relativity import energy2proper_velocity, proper_velocity2energy, momentum2proper_velocity, proper_velocity2momentum, proper_velocity2gamma, energy2gamma
 from abel.utilities.statistics import prct_clean, prct_clean2d
 from abel.utilities.plasma_physics import k_p
 from abel.physics_models.hills_equation import evolve_hills_equation_analytic
+from abel.physics_models.betatron_motion import evolve_betatron_motion
 from matplotlib import pyplot as plt
 
 class Beam():
@@ -403,7 +405,7 @@ class Beam():
         fig.set_figwidth(8)
         fig.set_figheight(5)  
             
-        p = ax.pcolor(zs*1e6, Es/1e9, -dQdzdE*1e15, cmap='GnBu', shading='auto')
+        p = ax.pcolor(zs*1e6, Es/1e9, -dQdzdE*1e15, cmap=CONFIG.default_cmap, shading='auto')
         ax.set_xlabel('z (um)')
         ax.set_ylabel('E (GeV)')
         ax.set_title('Longitudinal phase space')
@@ -416,7 +418,7 @@ class Beam():
         fig, ax = plt.subplots()
         fig.set_figwidth(8)
         fig.set_figheight(5)  
-        p = ax.pcolor(xs*1e6, xps*1e3, -dQdxdxp*1e3, cmap='GnBu', shading='auto')
+        p = ax.pcolor(xs*1e6, xps*1e3, -dQdxdxp*1e3, cmap=CONFIG.default_cmap, shading='auto')
         ax.set_xlabel('x (um)')
         ax.set_ylabel('x'' (mrad)')
         ax.set_title('Horizontal trace space')
@@ -429,7 +431,7 @@ class Beam():
         fig, ax = plt.subplots()
         fig.set_figwidth(8)
         fig.set_figheight(5)  
-        p = ax.pcolor(ys*1e6, yps*1e3, -dQdydyp*1e3, cmap='GnBu', shading='auto')
+        p = ax.pcolor(ys*1e6, yps*1e3, -dQdydyp*1e3, cmap=CONFIG.default_cmap, shading='auto')
         ax.set_xlabel('y (um)')
         ax.set_ylabel('y'' (mrad)')
         ax.set_title('Vertical trace space')
@@ -519,7 +521,26 @@ class Beam():
         self.set_ys(ys+y0_driver)
         self.set_uys(uys)
         
+    def apply_betatron_radiation_reaction(self, L, n0, deltaEs, x0_driver=0, y0_driver=0, enable_rr = True):
+
+        # remove particles with subzero energy
+        del self[self.Es() < 0]
+        del self[np.isnan(self.Es())]
+        gamma0s = energy2gamma(self.Es())
         
+        gammas = energy2gamma(abs(self.Es()+deltaEs))
+        dgamma_ds = (gammas-gamma0s)/L
+        
+        # calculate final positions and normalized momentum after betatron motion
+        xs, uxs, ys, uys, Es = evolve_betatron_motion(self.xs()-x0_driver, self.uxs(), self.ys()-y0_driver, self.uys(), L, gamma0s, dgamma_ds, k_p(n0), enable_rr)
+        
+        # set new beam positions and normalized momentum (shift back driver offsets)
+        self.set_xs(xs+x0_driver)
+        self.set_uxs(uxs)
+        self.set_ys(ys+y0_driver)
+        self.set_uys(uys)
+
+        return Es
   
     ## SAVE AND LOAD BEAM
     

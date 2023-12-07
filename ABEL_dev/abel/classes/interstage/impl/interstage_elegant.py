@@ -1,4 +1,4 @@
-import uuid, os, scipy
+import uuid, os, scipy, shutil
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.constants as SI
@@ -235,7 +235,13 @@ class InterstageElegant(Interstage):
     def track(self, beam0, savedepth=0, runnable=None, verbose=False):
         
         # make temporary folder and files
-        tmpfolder = CONFIG.temp_path + str(uuid.uuid4())
+        # create the parent directory if it doesn't exist
+        parent_dir = CONFIG.temp_path
+        if not os.path.exists(parent_dir):
+            os.makedirs(parent_dir)
+        
+        # create the temporary folder
+        tmpfolder = os.path.join(parent_dir, str(uuid.uuid4()))
         os.mkdir(tmpfolder)
         beamfile = tmpfolder + '/beam.bun'
         latticefile = tmpfolder + '/interstage.lte'
@@ -257,13 +263,14 @@ class InterstageElegant(Interstage):
         beam.remove_halo_particles()
         
         # remove temporary files
-        os.remove(beamfile)
-        os.remove(latticefile)
-        os.remove(lensfile)
-        beamfile_backup = beamfile + '~'
-        if os.path.exists(beamfile_backup):
-            os.remove(beamfile_backup)
-        os.rmdir(tmpfolder)
+        shutil.rmtree(tmpfolder)
+        #os.remove(beamfile)
+        #os.remove(latticefile)
+        #os.remove(lensfile)
+        #beamfile_backup = beamfile + '~'
+        #if os.path.exists(beamfile_backup):
+        #    os.remove(beamfile_backup)
+        #os.rmdir(tmpfolder)
 
         return super().track(beam, savedepth, runnable, verbose)
     

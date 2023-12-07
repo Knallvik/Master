@@ -1,6 +1,6 @@
 # suppress numba warnings from Ocelot
-from numba.core.errors import NumbaDeprecationWarning, NumbaPendingDeprecationWarning
 import warnings
+from numba.core.errors import NumbaDeprecationWarning, NumbaPendingDeprecationWarning
 warnings.simplefilter('ignore', category=NumbaDeprecationWarning)
 warnings.simplefilter('ignore', category=NumbaPendingDeprecationWarning)
 
@@ -35,6 +35,7 @@ from .classes.stage.impl.stage_nonlinear_1d import *
 from .classes.stage.impl.stage_hipace import *
 from .classes.stage.impl.stage_wake_t import *
 from .classes.stage.impl.stage_quasistatic_2d import *
+from .classes.stage.impl.stage_quasistatic_2d_radiation_reaction import *
 from .classes.stage.impl.stage_slice_transverse_wake_instability import *
 from .classes.stage.impl.stage_particle_transverse_wake_instability import *
 from .classes.interstage.impl.interstage_null import *
