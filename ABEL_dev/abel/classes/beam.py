@@ -202,7 +202,15 @@ class Beam():
         self.set_xs(vector[0,:])
         self.set_xps(vector[1,:])
         self.set_ys(vector[2,:])
-        self.set_yps(vector[3,:])  
+        self.set_yps(vector[3,:]) 
+
+    def norm_transverse_vector(self):
+        vector = np.zeros((4,len(self)))
+        vector[0,:] = self.xs()
+        vector[1,:] = self.uxs()/SI.c
+        vector[2,:] = self.ys()
+        vector[3,:] = self.uys()/SI.c
+        return vector
     
     
     ## BEAM STATISTICS
@@ -313,7 +321,21 @@ class Beam():
         ys, yps = prct_clean2d(self.ys(), self.yps(), clean)
         covy = np.cov(ys, yps)
         return covy[1,1]/np.sqrt(np.linalg.det(covy))
-    
+
+    def intrinsic_emittance(self):
+        covxy = np.cov(self.norm_transverse_vector())
+        return np.sqrt(np.sqrt(np.linalg.det(covxy)))
+
+    def angular_momentum(self):
+        covxy = np.cov(self.norm_transverse_vector())
+        det_covxy_cross = np.linalg.det(covxy[2:4,0:2])
+        return np.sign(det_covxy_cross)*np.sqrt(np.abs(det_covxy_cross))
+
+    def eigen_emittance_max(self):
+        return np.sqrt(self.norm_emittance_x()*self.norm_emittance_y()) + self.angular_momentum()
+
+    def eigen_emittance_min(self):
+        return np.sqrt(self.norm_emittance_x()*self.norm_emittance_y()) - self.angular_momentum()
     
     def peak_density(self):
         return (self.charge()/SI.e)/(np.sqrt(2*SI.pi)**3*self.beam_size_x()*self.beam_size_y()*self.bunch_length())
@@ -437,6 +459,19 @@ class Beam():
         ax.set_title('Vertical trace space')
         cb = fig.colorbar(p)
         cb.ax.set_ylabel('Charge density (pC/um/mrad)')
+
+    def plot_transverse_profile(self):
+        dQdxdy, xs, ys = self.phase_space_density(self.xs, self.ys)
+
+        fig, ax = plt.subplots()
+        fig.set_figwidth(8)
+        fig.set_figheight(5)  
+        p = ax.pcolor(xs*1e6, ys*1e6, -dQdxdy, cmap=CONFIG.default_cmap, shading='auto')
+        ax.set_xlabel('x (um)')
+        ax.set_ylabel('y (um)')
+        ax.set_title('Transverse profile')
+        cb = fig.colorbar(p)
+        cb.ax.set_ylabel('Charge density (pC/um^2)')
         
         
     
@@ -480,16 +515,20 @@ class Beam():
         mag = np.sqrt(beta_mag)
 
         if axis_defining_beam is None:
-            x_offset, y_offset = 0, 0
-            ux_offset, uy_offset = 0, 0
+            x_offset = 0
+            y_offset = 0
+            ux_offset = 0
+            uy_offset = 0
         else:
-            x_offset, y_offset = axis_defining_beam.x_offset(), axis_defining_beam.y_offset()
-            ux_offset, uy_offset = axis_defining_beam.ux_offset(), axis_defining_beam.ux_offset()
+            x_offset = axis_defining_beam.x_offset()
+            y_offset = axis_defining_beam.y_offset()
+            ux_offset = axis_defining_beam.ux_offset()
+            uy_offset = axis_defining_beam.uy_offset()
         
-        self.set_xs((self.xs()-x_offset) * mag + x_offset)
-        self.set_ys(self.ys() * mag)
-        self.set_uxs(self.uxs() / mag)
-        self.set_uys(self.uys() / mag)
+        self.set_xs((self.xs()-x_offset)*mag + x_offset)
+        self.set_ys((self.ys()-y_offset)*mag + y_offset)
+        self.set_uxs((self.uxs()-ux_offset)/mag + ux_offset)
+        self.set_uys((self.uys()-uy_offset)/mag + uy_offset)
         
         
     def flip_transverse_phase_spaces(self, flip_momenta=True, flip_positions=False):
@@ -647,7 +686,7 @@ class Beam():
         
     # load beam (from OpenPMD format)
     @classmethod
-    def load(_, filename, beam_name="beam"):
+    def load(_, filename, beam_name='beam'):
         
         # load file
         series = io.Series(filename, io.Access.read_only)
