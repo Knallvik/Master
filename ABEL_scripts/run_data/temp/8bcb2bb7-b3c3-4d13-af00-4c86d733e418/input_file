@@ -1,0 +1,62 @@
+amr.n_cell = 511 511 397
+
+hipace.normalized_units = 0
+hipace.bxby_solver = explicit
+
+hipace.dt = 4.8922733962395635e-12 # TODO: set automatic timestep
+amr.blocking_factor = 1
+amr.max_level = 0
+
+hipace.verbose = 1
+max_step = 75 # TODO: set automatic timestep
+hipace.output_period = 75
+
+hipace.depos_order_xy = 1
+
+geometry.coord_sys   = 0                  # 0: Cartesian
+geometry.is_periodic = 1 1 0  # Is periodic?
+geometry.prob_lo     = -0.0005429021663382562 -0.0005429021663382562 0.0     # physical domain
+geometry.prob_hi     = 0.0005429021663382562 0.0005429021663382562 0.0008439477584087767
+
+beams.names = driver beam # 'driver' or 'driver beam' or 'driver beam test_particle'
+beams.insitu_period = 1
+
+beam.injection_type = from_file
+beam.input_file = beam.h5
+beam.iteration = 0
+beam.do_radiation_reaction = 1
+
+driver.injection_type = from_file
+driver.input_file = driver.h5
+driver.iteration = 0
+
+test_particle.injection_type = from_file
+test_particle.input_file = empty.h5
+test_particle.iteration = 0
+test_particle.do_radiation_reaction = 1
+
+plasmas.names = plasma # 'plasma' or 'electrons ions'
+
+# if ion motion disabled
+plasma.density(x,y,z) = 2e+21
+plasma.ppc = 1 1
+plasma.element = electron
+plasma.do_symmetrize = 1
+
+# if ion motion enabled
+electrons.element = electron
+electrons.density(x,y,z) = 2e+21
+electrons.do_symmetrize = 1
+electrons.ppc = 1 1
+electrons.neutralize_background = 0 
+ions.element = H
+ions.density(x,y,z) = 2e+21
+ions.do_symmetrize = 1
+ions.ppc = 1 1
+ions.neutralize_background = 0
+ions.can_ionize = 0
+ions.initial_ion_level = 1
+ions.ionization_product = electrons
+
+diagnostic.diag_type = xz
+diagnostic.field_data = Ez ExmBy rho jz_beam

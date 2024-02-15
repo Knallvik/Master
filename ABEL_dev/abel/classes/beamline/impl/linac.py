@@ -325,7 +325,6 @@ class Linac(Beamline):
         axs[2,2].set_ylabel('Transverse offset (um)')
         
         plt.show()
-
         return fig
     
     
@@ -394,7 +393,7 @@ class Linac(Beamline):
 
     
     # animate the longitudinal phase space
-    def animate_lps(self, rel_energy_window=0.06, file_name = None):
+    def animate_lps(self, rel_energy_window=0.06):
         
         # set up figure
         fig, axs = plt.subplots(3, 2, gridspec_kw={'width_ratios': [2, 1], 'height_ratios': [1, 2, 1]})
@@ -515,17 +514,10 @@ class Linac(Beamline):
         animation = FuncAnimation(fig, frameFcn, frames=range(self.num_outputs()), repeat=False, interval=100)
 
         # save the animation as a GIF
-
-        
         plot_path = self.run_path() + 'plots/'
         if not os.path.exists(plot_path):
             os.makedirs(plot_path)
-            
-        if file_name is None:
-            filename = plot_path + 'lps_shot' + str(self.shot) + '.gif'
-        else:
-            filename = plot_path + file_name + '.gif'
-            
+        filename = plot_path + 'lps_shot' + str(self.shot) + '.gif'
         animation.save(filename, writer="pillow", fps=10)
 
         # hide the figure

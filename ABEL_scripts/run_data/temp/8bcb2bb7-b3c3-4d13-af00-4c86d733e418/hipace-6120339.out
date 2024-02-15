@@ -1,0 +1,102 @@
+Initializing AMReX (23.11-17-g9e35dc19489d)...
+MPI initialized with 32 MPI processes
+MPI initialized with thread support level 0
+Initializing HIP...
+HIP initialized with 32 devices.
+AMReX (23.11-17-g9e35dc19489d) initialized
+WARNING: 'hipace.output_period' is deprecated! Use 'diagnostic.output_period' instead!
+HiPACE++ (v23.11-3-ga69050019f52-dirty) running in double precision
+using the leapfrog plasma particle pusher
+using C2R rocFFT of sizes 512 and 512 with 0 MiB of work area
+Rank 31 started  step 0 at time = 0 with dt = 4.892273396e-12
+Rank 23 started  step 8 at time = 3.913818717e-11 with dt = 4.892273396e-12
+Rank 30 started  step 1 at time = 4.892273396e-12 with dt = 4.892273396e-12
+Rank 22 started  step 9 at time = 4.403046057e-11 with dt = 4.892273396e-12
+Rank 21 started  step 10 at time = 4.892273396e-11 with dt = 4.892273396e-12
+Rank 20 started  step 11 at time = 5.381500736e-11 with dt = 4.892273396e-12
+Rank 29 started  step 2 at time = 9.784546792e-12 with dt = 4.892273396e-12
+Rank 19 started  step 12 at time = 5.870728075e-11 with dt = 4.892273396e-12
+Rank 28 started  step 3 at time = 1.467682019e-11 with dt = 4.892273396e-12
+Rank 18 started  step 13 at time = 6.359955415e-11 with dt = 4.892273396e-12
+Rank 27 started  step 4 at time = 1.956909358e-11 with dt = 4.892273396e-12
+Rank 17 started  step 14 at time = 6.849182755e-11 with dt = 4.892273396e-12
+Rank 26 started  step 5 at time = 2.446136698e-11 with dt = 4.892273396e-12
+Rank 16 started  step 15 at time = 7.338410094e-11 with dt = 4.892273396e-12
+Rank 25 started  step 6 at time = 2.935364038e-11 with dt = 4.892273396e-12
+Rank 24 started  step 7 at time = 3.424591377e-11 with dt = 4.892273396e-12
+Rank 15 started  step 16 at time = 7.827637434e-11 with dt = 4.892273396e-12
+Rank 13 started  step 18 at time = 8.806092113e-11 with dt = 4.892273396e-12
+Rank 14 started  step 17 at time = 8.316864774e-11 with dt = 4.892273396e-12
+Rank 11 started  step 20 at time = 9.784546792e-11 with dt = 4.892273396e-12
+Rank 12 started  step 19 at time = 9.295319453e-11 with dt = 4.892273396e-12
+Rank 10 started  step 21 at time = 1.027377413e-10 with dt = 4.892273396e-12
+Rank 9 started  step 22 at time = 1.076300147e-10 with dt = 4.892273396e-12
+Rank 7 started  step 24 at time = 1.174145615e-10 with dt = 4.892273396e-12
+Rank 8 started  step 23 at time = 1.125222881e-10 with dt = 4.892273396e-12
+Rank 6 started  step 25 at time = 1.223068349e-10 with dt = 4.892273396e-12
+Rank 5 started  step 26 at time = 1.271991083e-10 with dt = 4.892273396e-12
+Rank 4 started  step 27 at time = 1.320913817e-10 with dt = 4.892273396e-12
+Rank 3 started  step 28 at time = 1.369836551e-10 with dt = 4.892273396e-12
+Rank 0 started  step 31 at time = 1.516604753e-10 with dt = 4.892273396e-12
+Rank 1 started  step 30 at time = 1.467682019e-10 with dt = 4.892273396e-12
+Rank 2 started  step 29 at time = 1.418759285e-10 with dt = 4.892273396e-12
+Rank 30 started  step 33 at time = 1.614450221e-10 with dt = 4.892273396e-12
+Rank 31 started  step 32 at time = 1.565527487e-10 with dt = 4.892273396e-12
+Rank 29 started  step 34 at time = 1.663372955e-10 with dt = 4.892273396e-12
+Rank 28 started  step 35 at time = 1.712295689e-10 with dt = 4.892273396e-12
+Rank 27 started  step 36 at time = 1.761218423e-10 with dt = 4.892273396e-12
+Rank 26 started  step 37 at time = 1.810141157e-10 with dt = 4.892273396e-12
+Rank 25 started  step 38 at time = 1.859063891e-10 with dt = 4.892273396e-12
+Rank 24 started  step 39 at time = 1.907986625e-10 with dt = 4.892273396e-12
+Rank 23 started  step 40 at time = 1.956909358e-10 with dt = 4.892273396e-12
+Rank 22 started  step 41 at time = 2.005832092e-10 with dt = 4.892273396e-12
+Rank 21 started  step 42 at time = 2.054754826e-10 with dt = 4.892273396e-12
+Rank 20 started  step 43 at time = 2.10367756e-10 with dt = 4.892273396e-12
+Rank 19 started  step 44 at time = 2.152600294e-10 with dt = 4.892273396e-12
+Rank 18 started  step 45 at time = 2.201523028e-10 with dt = 4.892273396e-12
+Rank 17 started  step 46 at time = 2.250445762e-10 with dt = 4.892273396e-12
+Rank 16 started  step 47 at time = 2.299368496e-10 with dt = 4.892273396e-12
+Rank 15 started  step 48 at time = 2.34829123e-10 with dt = 4.892273396e-12
+Rank 14 started  step 49 at time = 2.397213964e-10 with dt = 4.892273396e-12
+Rank 13 started  step 50 at time = 2.446136698e-10 with dt = 4.892273396e-12
+Rank 12 started  step 51 at time = 2.495059432e-10 with dt = 4.892273396e-12
+Rank 11 started  step 52 at time = 2.543982166e-10 with dt = 4.892273396e-12
+Rank 10 started  step 53 at time = 2.5929049e-10 with dt = 4.892273396e-12
+Rank 9 started  step 54 at time = 2.641827634e-10 with dt = 4.892273396e-12
+Rank 8 started  step 55 at time = 2.690750368e-10 with dt = 4.892273396e-12
+Rank 7 started  step 56 at time = 2.739673102e-10 with dt = 4.892273396e-12
+Rank 6 started  step 57 at time = 2.788595836e-10 with dt = 4.892273396e-12
+Rank 5 started  step 58 at time = 2.83751857e-10 with dt = 4.892273396e-12
+Rank 4 started  step 59 at time = 2.886441304e-10 with dt = 4.892273396e-12
+Rank 3 started  step 60 at time = 2.935364038e-10 with dt = 4.892273396e-12
+Rank 2 started  step 61 at time = 2.984286772e-10 with dt = 4.892273396e-12
+Rank 1 started  step 62 at time = 3.033209506e-10 with dt = 4.892273396e-12
+Rank 0 started  step 63 at time = 3.08213224e-10 with dt = 4.892273396e-12
+Rank 31 started  step 64 at time = 3.131054974e-10 with dt = 4.892273396e-12
+Rank 30 started  step 65 at time = 3.179977708e-10 with dt = 4.892273396e-12
+Rank 29 started  step 66 at time = 3.228900442e-10 with dt = 4.892273396e-12
+Rank 28 started  step 67 at time = 3.277823175e-10 with dt = 4.892273396e-12
+Rank 27 started  step 68 at time = 3.326745909e-10 with dt = 4.892273396e-12
+Rank 26 started  step 69 at time = 3.375668643e-10 with dt = 4.892273396e-12
+Rank 25 started  step 70 at time = 3.424591377e-10 with dt = 4.892273396e-12
+Rank 24 started  step 71 at time = 3.473514111e-10 with dt = 4.892273396e-12
+Rank 23 started  step 72 at time = 3.522436845e-10 with dt = 4.892273396e-12
+Rank 22 started  step 73 at time = 3.571359579e-10 with dt = 4.892273396e-12
+Rank 21 started  step 74 at time = 3.620282313e-10 with dt = 4.892273396e-12
+Rank 20 started  step 75 at time = 3.669205047e-10 with dt = 4.892273396e-12
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  Chunks cannot be written for a constant RecordComponent.
+SIGABRT
+See Backtrace.20 file for details
+MPICH ERROR [Rank 20] [job id 6120339.0] [Thu Feb 15 14:59:24 2024] [nid006662] - Abort(6) (rank 20 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 6) - process 20
+
+aborting job:
+application called MPI_Abort(MPI_COMM_WORLD, 6) - process 20
+srun: error: nid006662: task 20: Exited with exit code 255
+srun: launch/slurm: _step_signal: Terminating StepId=6120339.0
+slurmstepd: error: *** STEP 6120339.0 ON nid006660 CANCELLED AT 2024-02-15T14:59:25 ***
+srun: error: nid006661: tasks 8-15: Terminated
+srun: error: nid006660: tasks 0-7: Terminated
+srun: error: nid006663: tasks 24-31: Terminated
+srun: error: nid006662: tasks 16-19,21-23: Terminated
+srun: Force Terminated StepId=6120339.0

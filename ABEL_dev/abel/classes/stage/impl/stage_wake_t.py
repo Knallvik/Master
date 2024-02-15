@@ -10,14 +10,13 @@ from openpmd_viewer import OpenPMDTimeSeries
 
 class StageWakeT(Stage):
     
-    def __init__(self, length=None, nom_energy_gain=None, plasma_density=None, driver_source=None, ramp_beta_mag=1):
+    def __init__(self, length=None, nom_energy_gain=None, plasma_density=None, driver_source=None, ramp_beta_mag=1, num_cell_xy=256):
         
-        super().__init__(length, nom_energy_gain, plasma_density)
+        super().__init__(length, nom_energy_gain, plasma_density, driver_source)
         
-        self.driver_source = driver_source
         self.ramp_beta_mag = ramp_beta_mag
-
-
+        self.num_cell_xy = num_cell_xy
+    
         
     def track(self, beam0, savedepth=0, runnable=None, verbose=False):
         
@@ -46,7 +45,11 @@ class StageWakeT(Stage):
         box_range_z = [box_min_z, box_max_z]
         
         # making transverse box size
-        box_size_r = np.max([5/k_p(self.plasma_density), 2*blowout_radius(self.plasma_density, driver0.peak_current())])
+        box_size_r = np.max([4/k_p(self.plasma_density), 2*blowout_radius(self.plasma_density, driver0.peak_current())])
+        
+        # calculate number of cells in x to get similar resolution
+        dr = box_size_r/self.num_cell_xy
+        num_cell_z = round((box_max_z-box_min_z)/dr)
         
         # find stepsize
         beta_matched = np.sqrt(2*min(beam0.gamma(),driver0.gamma()/2))/k_p(self.plasma_density)
@@ -55,7 +58,7 @@ class StageWakeT(Stage):
         n_out = round(self.length/dz/8)
         plasma = wake_t.PlasmaStage(length=self.length, density=self.plasma_density, wakefield_model='quasistatic_2d',
                                     r_max=box_size_r, r_max_plasma=box_size_r, xi_min=box_min_z, xi_max=box_max_z, 
-                                    n_out=n_out, n_r=128, n_xi=256, dz_fields=dz, ppc=1)
+                                    n_out=n_out, n_r=int(self.num_cell_xy), n_xi=int(num_cell_z), dz_fields=dz, ppc=1)
         
         # do tracking
         bunches = plasma.track([driver0_wake_t, beam0_wake_t], opmd_diag=True, diag_dir=tmpfolder)
@@ -135,7 +138,7 @@ class StageWakeT(Stage):
         self.initial.plasma.density.extent = metadata0_plasma.imshow_extent
         self.initial.plasma.density.rho = -(rho0_plasma/SI.e)
         
-        # extract final beam density
+        # extract initial beam density
         data0_beam = ts.get_particle(species='beam', var_list=['x','y','z','w'], iteration=min(ts.iterations))
         data0_driver = ts.get_particle(species='driver', var_list=['x','y','z','w'], iteration=min(ts.iterations))
         extent0 = metadata0_plasma.imshow_extent
@@ -149,7 +152,7 @@ class StageWakeT(Stage):
         self.initial.beam.density.extent = metadata0_plasma.imshow_extent
         self.initial.beam.density.rho = (jz0_beam+jz0_driver)/(dr0*dr0*dz0)
 
-        # extract initial plasma density
+        # extract final plasma density
         rho_plasma, metadata_plasma = ts.get_field(field='rho', iteration=max(ts.iterations))
         self.final.plasma.density.extent = metadata_plasma.imshow_extent
         self.final.plasma.density.rho = -(rho_plasma/SI.e)
@@ -168,9 +171,6 @@ class StageWakeT(Stage):
         self.final.beam.density.extent = metadata_plasma.imshow_extent
         self.final.beam.density.rho = (jz_beam+jz_driver)/(dr*dr*dz)
         
-        
-    def energy_usage(self):
-        return None # TODO
     
     def matched_beta_function(self, energy):
         return beta_matched(self.plasma_density, energy) * self.ramp_beta_mag

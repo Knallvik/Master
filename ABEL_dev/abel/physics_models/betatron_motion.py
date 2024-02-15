@@ -59,11 +59,6 @@ def evolve_betatron_motion(x0, ux0, y0, uy0, L, gamma, dgamma_ds, kp, enable_rr 
     vys = uy0/gamma
     vxs = ux0/gamma    
     
-    #xs = np.zeros(length)
-    #uxs = np.zeros(length)
-    #ys = np.zeros(length)
-    #uys = np.zeros(length)
-    #Es = np.zeros(length)
     # Solve the equation of motion for each particle, and loop over Cs as well, as it is different for each particle
     
     def parallel_process(i):

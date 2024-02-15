@@ -1,0 +1,70 @@
+Host Name: nid006662
+=== If no file names and line numbers are shown below, one can run
+            addr2line -Cpfie my_exefile my_line_address
+    to convert `my_line_address` (e.g., 0x4a6b) into file name and line number.
+    Or one can use amrex/Tools/Backtrace/parse_bt.py.
+
+=== Please note that the line number reported by addr2line may not be accurate.
+    One can use
+            readelf -wl my_exefile | grep my_line_address'
+    to find out the offset for that line.
+
+ 0: /project/project_465000445//software/hipace/build/bin/hipace() [0xb0edc6]
+    amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at ??:?
+
+ 1: /project/project_465000445//software/hipace/build/bin/hipace() [0xb0e8be]
+    amrex::BLBackTrace::handler(int) at ??:?
+
+ 2: /lib64/libc.so.6(+0x4adc0) [0x14ad7f4b8dc0]
+
+ 3: /lib64/libc.so.6(gsignal+0x10d) [0x14ad7f4b8d2b]
+
+ 4: /lib64/libc.so.6(abort+0x177) [0x14ad7f4ba3e5]
+
+ 5: /opt/cray/pe/gcc-libs/libstdc++.so.6(+0xa55c9) [0x14ad7fa755c9]
+    _ZN9__gnu_cxx27__verbose_terminate_handlerEv
+../../../../cpe-gcc-12.2.0-202304182231.7dfee50f41751/libstdc++-v3/libsupc++/vterminate.cc:75:10
+
+ 6: /opt/cray/pe/gcc-libs/libstdc++.so.6(+0xb0bfa) [0x14ad7fa80bfa]
+    _ZN10__cxxabiv111__terminateEPFvvE
+../../../../cpe-gcc-12.2.0-202304182231.7dfee50f41751/libstdc++-v3/libsupc++/eh_terminate.cc:48:15
+
+ 7: /opt/cray/pe/gcc-libs/libstdc++.so.6(+0xb0c65) [0x14ad7fa80c65]
+    ?? ??:0
+
+ 8: /opt/cray/pe/gcc-libs/libstdc++.so.6(+0xb0eb7) [0x14ad7fa80eb7]
+    ?? ??:0
+
+ 9: /project/project_465000445//software/hipace/build/bin/hipace() [0x884892]
+    openPMD::RecordComponent::storeChunk(openPMD::auxiliary::WriteBuffer, openPMD::Datatype, std::vector<unsigned long, std::allocator<unsigned long> >, std::vector<unsigned long, std::allocator<unsigned long> >) at ??:?
+
+10: /project/project_465000445//software/hipace/build/bin/hipace() [0x826b44]
+    void openPMD::RecordComponent::storeChunk<unsigned long>(std::shared_ptr<unsigned long>, std::vector<unsigned long, std::allocator<unsigned long> >, std::vector<unsigned long, std::allocator<unsigned long> >) at ??:?
+
+11: /project/project_465000445//software/hipace/build/bin/hipace() [0x8212cf]
+    OpenPMDWriter::WriteBeamParticleData(MultiBeam&, openPMD::Iteration, amrex::Geometry const&, amrex::Vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >) at ??:?
+
+12: /project/project_465000445//software/hipace/build/bin/hipace() [0x8209d8]
+    OpenPMDWriter::WriteDiagnostics(amrex::Vector<FieldDiagnosticData, std::allocator<FieldDiagnosticData> > const&, MultiBeam&, double, int, amrex::Vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, amrex::Vector<amrex::Geometry, std::allocator<amrex::Geometry> > const&, OpenPMDWriterCallType) at ??:?
+
+13: /project/project_465000445//software/hipace/build/bin/hipace() [0x71f89e]
+    Hipace::WriteDiagnostics(int) at ??:?
+
+14: /project/project_465000445//software/hipace/build/bin/hipace() [0x71e6a3]
+    Hipace::Evolve() at ??:?
+
+15: /project/project_465000445//software/hipace/build/bin/hipace() [0x716edf]
+    main at ??:?
+
+16: /lib64/libc.so.6(__libc_start_main+0xef) [0x14ad7f4a324d]
+
+17: /project/project_465000445//software/hipace/build/bin/hipace() [0x716d7a]
+    _start
+../sysdeps/x86_64/start.S:122
+
+
+===== TinyProfilers ======
+main()
+Hipace::Evolve()
+OpenPMDWriter::WriteBeamParticleData()
+

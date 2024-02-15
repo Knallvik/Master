@@ -17,19 +17,18 @@ import read_insitu_diagnostics
 
 class StageHipace(Stage):
     
-    def __init__(self, length=None, nom_energy_gain=None, plasma_density=None, driver_source=None, ramp_beta_mag=1, keep_data=False, output=None, ion_motion=True, ion_species='H', beam_ionization=True, radiation_reaction=False, num_nodes=1):
+    def __init__(self, length=None, nom_energy_gain=None, plasma_density=None, driver_source=None, ramp_beta_mag=1, keep_data=False, output=None, ion_motion=True, ion_species='H', beam_ionization=True, radiation_reaction=False, num_nodes=1, num_cell_xy=511, driver_only=False, test_particle_source=None):
         
-        super().__init__(length, nom_energy_gain, plasma_density)
+        super().__init__(length, nom_energy_gain, plasma_density, driver_source, ramp_beta_mag)
         
-        self.driver_source = driver_source
-        self.ramp_beta_mag = ramp_beta_mag
-        
+        # simulation specifics
         self.keep_data = keep_data
         self.output = output
-
-        # simulation specifics
         self.num_nodes = num_nodes
-
+        self.num_cell_xy = num_cell_xy
+        self.driver_only = driver_only
+        self.test_particle_source = test_particle_source
+        
         # physics flags
         self.ion_motion = ion_motion
         self.ion_species = ion_species
@@ -81,19 +80,33 @@ class StageHipace(Stage):
         filename_driver = 'driver.h5'
         path_driver = tmpfolder + filename_driver
         driver0.save(filename = path_driver, beam_name = 'driver')
-        
+
+        if self.test_particle_source is not None:
+            test_particle0 = self.test_particle_source.track()
+            filename_test_particle = 'test_particle.h5'
+            path_test_particle = tmpfolder + filename_test_particle
+            test_particle0.save(filename = path_test_particle, beam_name = 'test_particle')
+        else: 
+            filename_test_particle = ''
         
         # MAKE INPUT FILE
         
         # make longitudinal box range
         num_sigmas = 6
-        box_min_z = beam0.z_offset() - num_sigmas * beam0.bunch_length()
+        if self.driver_only:
+            box_min_z = driver0.z_offset() + driver0.bunch_length() - np.max([2*np.pi/k_p(self.plasma_density), 2.1*blowout_radius(self.plasma_density, driver0.peak_current())])
+        else:
+            box_min_z = beam0.z_offset() - num_sigmas * beam0.bunch_length()
         box_max_z = min(driver0.z_offset() + num_sigmas * driver0.bunch_length(), np.max(driver0.zs())+0.5/k_p(self.plasma_density))
         box_range_z = [box_min_z, box_max_z]
         
         # making transverse box size
-        box_size_r = np.max([5/k_p(self.plasma_density), 2*blowout_radius(self.plasma_density, driver0.peak_current())])
-
+        box_size_r = 2*np.max([4/k_p(self.plasma_density), 2*blowout_radius(self.plasma_density, driver0.peak_current())])
+        
+        # calculate number of cells in x to get similar resolution
+        dr = box_size_r/self.num_cell_xy
+        num_cell_z = round((box_max_z-box_min_z)/dr)
+        
         # calculate the time step
         beta_matched = np.sqrt(2*min(beam0.gamma(),driver0.gamma()/2))/k_p(self.plasma_density)
         dz = beta_matched/20
@@ -119,7 +132,7 @@ class StageHipace(Stage):
         # input file
         filename_input = 'input_file'
         path_input = tmpfolder + filename_input
-        hipace_write_inputs(path_input, filename_beam, filename_driver, self.plasma_density, self.num_steps, time_step, box_range_z, box_size_r, ion_motion=self.ion_motion, ion_species=self.ion_species, beam_ionization=self.beam_ionization, radiation_reaction=self.radiation_reaction, output_period=output_period)
+        hipace_write_inputs(path_input, filename_beam, filename_driver, self.plasma_density, self.num_steps, time_step, box_range_z, box_size_r, ion_motion=self.ion_motion, ion_species=self.ion_species, beam_ionization=self.beam_ionization, radiation_reaction=self.radiation_reaction, output_period=output_period, num_cell_xy=self.num_cell_xy, num_cell_z=num_cell_z, driver_only=self.driver_only, filename_test_particle=filename_test_particle)
         
         
         ## RUN SIMULATION
@@ -129,13 +142,17 @@ class StageHipace(Stage):
         hipace_write_jobscript(filename_job_script, filename_input, num_nodes=self.num_nodes)
         
         # run HiPACE++
-        beam, driver = hipace_run(filename_job_script, self.num_steps)
+        beam, driver, test_particle = hipace_run(filename_job_script, self.num_steps)
+        if self.driver_only:
+            beam = beam0
         
         # !! QUICK FIX: TODO to make this a real ramp
         # apply plasma-density down ramp (magnify beta function)
         beam.magnify_beta_function(self.ramp_beta_mag, axis_defining_beam=driver0)
         driver.magnify_beta_function(self.ramp_beta_mag, axis_defining_beam=driver0)
-
+        
+        if test_particle:
+            
         
         ## ADD METADATA
         
@@ -164,39 +181,35 @@ class StageHipace(Stage):
         return super().track(beam, savedepth, runnable, verbose)
     
     
-    def energy_usage(self):
-        return None # TODO
-    
-    def matched_beta_function(self, energy):
-        return beta_matched(self.plasma_density, energy)*self.ramp_beta_mag
-    
-    
     def __extract_evolution(self, tmpfolder, beam0, runnable):
 
         insitu_path = tmpfolder + 'diags/insitu/'
-        insitu_file = insitu_path + 'reduced_beam.*.txt'
-
-        # extract in-situ data
-        all_data = read_insitu_diagnostics.read_file(insitu_file)
-        average_data = all_data['average']
-
-        # store variables
-        self.evolution.location = beam0.location + all_data['time']*SI.c
-        self.evolution.charge = read_insitu_diagnostics.total_charge(all_data)
-        self.evolution.energy = read_insitu_diagnostics.energy_mean_eV(all_data)
-        self.evolution.z = average_data['[z]']
-        self.evolution.x = average_data['[x]']
-        self.evolution.y = average_data['[y]']
-        self.evolution.xp = average_data['[ux]']/average_data['[uz]']
-        self.evolution.yp = average_data['[uy]']/average_data['[uz]']
-        self.evolution.energy_spread = read_insitu_diagnostics.energy_spread_eV(all_data)
-        self.evolution.rel_energy_spread = self.evolution.energy_spread/self.evolution.energy
-        self.evolution.beam_size_x = read_insitu_diagnostics.position_std(average_data, direction='x')
-        self.evolution.beam_size_y = read_insitu_diagnostics.position_std(average_data, direction='y')
-        self.evolution.bunch_length = read_insitu_diagnostics.position_std(average_data, direction='z')
-        self.evolution.emit_nx = read_insitu_diagnostics.emittance_x(average_data)
-        self.evolution.emit_ny = read_insitu_diagnostics.emittance_y(average_data)
-        # TODO: add angular momentum and normalized amplitude
+        
+        if not self.driver_only:
+            
+            insitu_file = insitu_path + 'reduced_beam.*.txt'
+                
+            # extract in-situ data
+            all_data = read_insitu_diagnostics.read_file(insitu_file)
+            average_data = all_data['average']
+    
+            # store variables
+            self.evolution.location = beam0.location + all_data['time']*SI.c
+            self.evolution.charge = read_insitu_diagnostics.total_charge(all_data)
+            self.evolution.energy = read_insitu_diagnostics.energy_mean_eV(all_data)
+            self.evolution.z = average_data['[z]']
+            self.evolution.x = average_data['[x]']
+            self.evolution.y = average_data['[y]']
+            self.evolution.xp = average_data['[ux]']/average_data['[uz]']
+            self.evolution.yp = average_data['[uy]']/average_data['[uz]']
+            self.evolution.energy_spread = read_insitu_diagnostics.energy_spread_eV(all_data)
+            self.evolution.rel_energy_spread = self.evolution.energy_spread/self.evolution.energy
+            self.evolution.beam_size_x = read_insitu_diagnostics.position_std(average_data, direction='x')
+            self.evolution.beam_size_y = read_insitu_diagnostics.position_std(average_data, direction='y')
+            self.evolution.bunch_length = read_insitu_diagnostics.position_std(average_data, direction='z')
+            self.evolution.emit_nx = read_insitu_diagnostics.emittance_x(average_data)
+            self.evolution.emit_ny = read_insitu_diagnostics.emittance_y(average_data)
+            # TODO: add angular momentum and normalized amplitude
 
         # delete or move data
         if self.keep_data:

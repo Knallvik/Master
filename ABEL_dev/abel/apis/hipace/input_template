@@ -1,4 +1,4 @@
-amr.n_cell = $n_cell_x $n_cell_y $n_cell_z
+amr.n_cell = $num_cell_x $num_cell_y $num_cell_z
 
 hipace.normalized_units = 0
 hipace.bxby_solver = explicit
@@ -18,7 +18,7 @@ geometry.is_periodic = 1 1 0  # Is periodic?
 geometry.prob_lo     = $grid_low_x $grid_low_y $grid_low_z     # physical domain
 geometry.prob_hi     = $grid_high_x $grid_high_y $grid_high_z
 
-beams.names = driver beam
+beams.names = $beam_components # 'driver' or 'driver beam' or 'driver beam test_particle'
 beams.insitu_period = 1
 
 beam.injection_type = from_file
@@ -29,6 +29,11 @@ beam.do_radiation_reaction = $radiation_reaction
 driver.injection_type = from_file
 driver.input_file = $filename_driver
 driver.iteration = 0
+
+test_particle.injection_type = from_file
+test_particle.input_file = $filename_test_particle
+test_particle.iteration = 0
+test_particle.do_radiation_reaction = $radiation_reaction
 
 plasmas.names = $plasma_components # 'plasma' or 'electrons ions'
 
